@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: user-activity-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/user_activity_service?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8081
+
+logging:
+  level:
+    org.springframework: INFO
+    com.useractivityservice: DEBUG
