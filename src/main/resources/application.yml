@@ -1,9 +1,22 @@
 spring:
   application:
     name: user-activity-service
-
+  cloud:
+    enabled: false
+    consul:
+      enabled: false
+      host: localhost
+      port: 8500
+      discovery:
+        hostname: localhost
+        prefer-ip-address: false
+        register: false
+        instance-id: user-activity-service-${server.port}
+        service-name: user-activity-service
+        health-check-path: /actuator/health
+        health-check-interval: 10s
   datasource:
-    url: jdbc:mysql://localhost:3306/user_activity_service?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/user_activity_service?useSSL=false&serverTimezone=UTC
     username: root
     password:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -17,9 +30,15 @@ spring:
         format_sql: true
 
 server:
-  port: 8081
+  port: 8003
 
 logging:
   level:
     org.springframework: INFO
     com.useractivityservice: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

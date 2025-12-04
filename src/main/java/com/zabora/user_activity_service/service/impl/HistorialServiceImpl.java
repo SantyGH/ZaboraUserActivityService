@@ -8,8 +8,8 @@ import com.zabora.user_activity_service.service.HistorialService;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,12 +21,10 @@ public class HistorialServiceImpl implements HistorialService {
 
     @Override
     public HistorialResponse registrarHistorial(CreateHistorialRequest request) {
-        HistorialReceta historial = new HistorialReceta();
-        historial.setUserId(request.userId());
-        historial.setRecipeId(request.recipeId());
-
-        // Asignamos la fecha actual antes de guardar
-        historial.setFechaVista(LocalDateTime.now());
+        HistorialReceta historial = HistorialReceta.builder()
+                .userId(request.userId())
+                .recipeId(request.recipeId())
+                .build();
 
         historial = historialRepository.save(historial);
 
@@ -50,4 +48,50 @@ public class HistorialServiceImpl implements HistorialService {
                 ))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<HistorialResponse> obtenerHistorialCompleto() {
+        return historialRepository.findAll()
+                .stream()
+                .map(h -> new HistorialResponse(
+                        h.getId(),
+                        h.getUserId(),
+                        h.getRecipeId(),
+                        h.getFechaVista()
+                ))
+                .sorted((a, b) -> b.fechaVista().compareTo(a.fechaVista()))
+                .collect(Collectors.toList());
+    }
+
+ // -------------------------------
+ // ELIMINACIONES
+ // -------------------------------
+ @Override
+ @Transactional
+ public String eliminarHistorialPorUsuario(Long userId) {
+     historialRepository.deleteByUserId(userId); // tu método existente
+     return "Historial del usuario " + userId + " eliminado correctamente";
+ }
+
+ @Override
+ @Transactional
+ public String eliminarHistorialCompleto() {
+     historialRepository.deleteAll(); // tu método existente
+     return "Todos los historiales eliminados correctamente";
+ }
+
+ @Override
+ @Transactional
+ public String eliminarRecetaPorUsuario(Long userId, Long recipeId) {
+     historialRepository.deleteByUserIdAndRecipeId(userId, recipeId); // tu método existente
+     return "Receta " + recipeId + " eliminada del historial del usuario " + userId;
+ }
+
+ @Override
+ @Transactional
+ public String eliminarRecetaDeTodosUsuarios(Long recipeId) {
+     historialRepository.deleteByRecipeId(recipeId); // tu método existente
+     return "Receta " + recipeId + " eliminada de todos los historiales";
+ }
+
 }
