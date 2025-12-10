@@ -12,5 +12,5 @@ import com.zabora.user_activity_service.model.dto.recipe.ResponseRecipes;
 public interface RecipeClient {
 
     @GetMapping("/api/recipes/multiple")
-    List<ResponseRecipes> getRecipesByIds(@RequestParam("ids") List<Long> ids);
+    List<ResponseRecipes> getRecipesByIds(@RequestParam("ids") List<Long>ids);
 }

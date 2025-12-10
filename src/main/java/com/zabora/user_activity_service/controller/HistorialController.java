@@ -24,8 +24,7 @@ public class HistorialController {
 
 	    if (historial.isEmpty()) return ResponseEntity.noContent().build();
 
-	    return ResponseEntity.ok(historial);
-	    }
+	    return ResponseEntity.ok(historial);}
 
 	
 	
