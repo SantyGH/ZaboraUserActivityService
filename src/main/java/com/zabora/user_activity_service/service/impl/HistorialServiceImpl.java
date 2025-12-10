@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.zabora.user_activity_service.model.dto.CreateHistorialRequest;
 import com.zabora.user_activity_service.model.dto.HistorialResponse;
-import com.zabora.user_activity_service.model.dto.recipe.ResponseRecipes;
+import com.zabora.user_activity_service.model.dto.ResponseRecipes;
 import com.zabora.user_activity_service.model.entities.HistorialReceta;
 import com.zabora.user_activity_service.repository.HistorialRepository;
 import com.zabora.user_activity_service.repository.RecipeClient;

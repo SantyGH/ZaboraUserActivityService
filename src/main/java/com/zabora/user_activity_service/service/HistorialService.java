@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.zabora.user_activity_service.model.dto.CreateHistorialRequest;
 import com.zabora.user_activity_service.model.dto.HistorialResponse;
-import com.zabora.user_activity_service.model.dto.recipe.ResponseRecipes;
+import com.zabora.user_activity_service.model.dto.ResponseRecipes;
 
 public interface HistorialService {
 
