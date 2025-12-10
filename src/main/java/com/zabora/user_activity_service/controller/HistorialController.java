@@ -9,10 +9,26 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
+
+
+
 @RestController
 @RequestMapping("/historial")
 public class HistorialController {
 
+	
+	@GetMapping("/usuario/{userId}/detallado") public ResponseEntity<List<ResponseRecipes>> obtenerHistorialDetallado(@PathVariable Long userId) {
+
+	    List<ResponseRecipes> historial = historialService.obtenerHistorialConRecetas(userId);
+
+	    if (historial.isEmpty()) return ResponseEntity.noContent().build();
+
+	    return ResponseEntity.ok(historial);
+	    }
+
+	
+	
     @Autowired
     private HistorialService historialService;
 

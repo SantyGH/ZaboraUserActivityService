@@ -1,9 +1,10 @@
 package com.zabora.user_activity_service.service;
 
+import java.util.List;
+
 import com.zabora.user_activity_service.model.dto.CreateHistorialRequest;
 import com.zabora.user_activity_service.model.dto.HistorialResponse;
-
-import java.util.List;
+import com.zabora.user_activity_service.model.dto.recipe.ResponseRecipes;
 
 public interface HistorialService {
 
@@ -13,7 +14,7 @@ public interface HistorialService {
 
     // Obtener historial de todos los usuarios
     List<HistorialResponse> obtenerHistorialCompleto();
-
+    List<ResponseRecipes> obtenerHistorialConRecetas(Long userId);
     // Eliminar historial
     String eliminarHistorialPorUsuario(Long userId);
     String eliminarHistorialCompleto();
