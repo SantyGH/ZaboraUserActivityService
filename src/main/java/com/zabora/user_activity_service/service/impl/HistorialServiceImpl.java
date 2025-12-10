@@ -13,7 +13,7 @@ import com.zabora.user_activity_service.model.entities.HistorialReceta;
 import com.zabora.user_activity_service.repository.HistorialRepository;
 import com.zabora.user_activity_service.repository.RecipeClient;
 import com.zabora.user_activity_service.service.HistorialService;
-
+import feign.FeignException;
 @Service
 public class HistorialServiceImpl implements HistorialService {
 
@@ -73,22 +73,30 @@ public class HistorialServiceImpl implements HistorialService {
 
     
     @Override
-    public List<ResponseRecipes> obtenerHistorialConRecetas(Long userId) {
+public List<ResponseRecipes> obtenerHistorialConRecetas(Long userId) {
 
-       
-        List<HistorialReceta> historial = historialRepository.findByUserIdOrderByFechaVistaDesc(userId);
+    List<HistorialReceta> historial = historialRepository.findByUserIdOrderByFechaVistaDesc(userId);
 
-        
-        List<Long> recipeIds = historial.stream()
-                .map(HistorialReceta::getRecipeId)
-                .distinct()
-                .toList();
+    List<Long> recipeIds = historial.stream()
+            .map(HistorialReceta::getRecipeId)
+            .distinct()
+            .toList();
 
-        if (recipeIds.isEmpty()) return List.of();
+    if (recipeIds.isEmpty()) return List.of();
 
-  
+    try {
         return recipeClient.getRecipesByIds(recipeIds);
+
+    } catch (FeignException.NotFound e) {
+        // Error 404 desde recipe-service
+        throw new RuntimeException("Alguna de las recetas no se encuentra disponible");
+    
+    } catch (FeignException e) {
+        // Error 500, timeouts, servicio caído, etc.
+        throw new RuntimeException("No se pudo obtener la información de las recetas. Intenta más tarde.");
     }
+}
+
 
 
 
