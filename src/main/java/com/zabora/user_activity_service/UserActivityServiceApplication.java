@@ -1,10 +1,10 @@
 package com.zabora.user_activity_service;
-
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@EnableFeignClient
+@EnableFeignClients
 public class UserActivityServiceApplication {
 	
 	public static void main(String[] args) {
