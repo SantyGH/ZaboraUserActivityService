@@ -9,7 +9,7 @@ import com.zabora.user_activity_service.model.dto.ResponseRecipes;
 public interface HistorialService {
 
     // Registrar y obtener historial de un usuario
-    HistorialResponse registrarHistorial(CreateHistorialRequest request);
+    HistorialResponse registrarHistorial(Long userId, CreateHistorialRequest request);
     List<HistorialResponse> obtenerHistorialPorUsuario(Long userId);
 
     // Obtener historial de todos los usuarios

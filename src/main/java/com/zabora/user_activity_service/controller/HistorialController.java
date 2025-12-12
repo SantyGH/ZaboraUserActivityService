@@ -16,23 +16,24 @@ import com.zabora.user_activity_service.model.dto.CreateHistorialRequest;
 import com.zabora.user_activity_service.model.dto.HistorialResponse;
 import com.zabora.user_activity_service.model.dto.ResponseRecipes;
 import com.zabora.user_activity_service.service.HistorialService;
-
-
-
-
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @RestController
 @RequestMapping("/historial")
 public class HistorialController {
 
-	
-	@GetMapping("/usuario/{userId}/detallado") public ResponseEntity<List<ResponseRecipes>> obtenerHistorialDetallado(@PathVariable Long userId) {
+    @GetMapping("/detallado")
+    public ResponseEntity<List<ResponseRecipes>> obtenerHistorialDetallado(
+            @RequestHeader("X-User-Id") Long userId) {
 
-	    List<ResponseRecipes> historial = historialService.obtenerHistorialConRecetas(userId);
+        List<ResponseRecipes> historial = historialService.obtenerHistorialConRecetas(userId);
 
-	    if (historial.isEmpty()) return ResponseEntity.noContent().build();
+        if (historial.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
 
-	    return ResponseEntity.ok(historial);}
+        return ResponseEntity.ok(historial);
+    }
 
     @Autowired
     private HistorialService historialService;
@@ -41,8 +42,12 @@ public class HistorialController {
     // Registrar historial de un usuario
     // -------------------------------
     @PostMapping
-    public ResponseEntity<HistorialResponse> registrarHistorial(@RequestBody CreateHistorialRequest request) {
-        HistorialResponse response = historialService.registrarHistorial(request);
+    public ResponseEntity<HistorialResponse> registrarHistorial(
+            @RequestHeader("X-User-Id") Long userId,
+            @RequestBody CreateHistorialRequest request
+    ) {
+
+        HistorialResponse response = historialService.registrarHistorial(userId, request);
         return ResponseEntity.ok(response);
     }
 
@@ -52,7 +57,9 @@ public class HistorialController {
     @GetMapping("/todos")
     public ResponseEntity<List<HistorialResponse>> obtenerHistorialCompleto() {
         List<HistorialResponse> historial = historialService.obtenerHistorialCompleto();
-        if (historial.isEmpty()) return ResponseEntity.noContent().build();
+        if (historial.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
         return ResponseEntity.ok(historial);
     }
 
@@ -62,7 +69,9 @@ public class HistorialController {
     @GetMapping("/usuario/{userId}")
     public ResponseEntity<List<HistorialResponse>> obtenerHistorialPorUsuario(@PathVariable Long userId) {
         List<HistorialResponse> historial = historialService.obtenerHistorialPorUsuario(userId);
-        if (historial.isEmpty()) return ResponseEntity.noContent().build();
+        if (historial.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
         return ResponseEntity.ok(historial);
     }
 
@@ -89,7 +98,7 @@ public class HistorialController {
     // -------------------------------
     @DeleteMapping("/usuario/{userId}/receta/{recipeId}")
     public ResponseEntity<String> eliminarRecetaPorUsuario(@PathVariable Long userId,
-                                                           @PathVariable Long recipeId) {
+            @PathVariable Long recipeId) {
         String mensaje = historialService.eliminarRecetaPorUsuario(userId, recipeId);
         return ResponseEntity.ok(mensaje);
     }

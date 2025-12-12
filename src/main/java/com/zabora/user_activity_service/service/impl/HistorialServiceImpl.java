@@ -2,7 +2,7 @@ package com.zabora.user_activity_service.service.impl;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
+import java.util.Collections;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +14,7 @@ import com.zabora.user_activity_service.repository.HistorialRepository;
 import com.zabora.user_activity_service.repository.RecipeClient;
 import com.zabora.user_activity_service.service.HistorialService;
 import feign.FeignException;
+
 @Service
 public class HistorialServiceImpl implements HistorialService {
 
@@ -21,15 +22,16 @@ public class HistorialServiceImpl implements HistorialService {
     private final RecipeClient recipeClient;
 
     public HistorialServiceImpl(HistorialRepository historialRepository,
-                                RecipeClient recipeClient) {
+            RecipeClient recipeClient) {
         this.historialRepository = historialRepository;
         this.recipeClient = recipeClient;
     }
 
     @Override
-    public HistorialResponse registrarHistorial(CreateHistorialRequest request) {
+    public HistorialResponse registrarHistorial(Long userId, CreateHistorialRequest request) {
+
         HistorialReceta historial = HistorialReceta.builder()
-                .userId(request.userId())
+                .userId(userId)
                 .recipeId(request.recipeId())
                 .build();
 
@@ -48,11 +50,11 @@ public class HistorialServiceImpl implements HistorialService {
         return historialRepository.findByUserIdOrderByFechaVistaDesc(userId)
                 .stream()
                 .map(h -> new HistorialResponse(
-                        h.getId(),
-                        h.getUserId(),
-                        h.getRecipeId(),
-                        h.getFechaVista()
-                ))
+                h.getId(),
+                h.getUserId(),
+                h.getRecipeId(),
+                h.getFechaVista()
+        ))
                 .collect(Collectors.toList());
     }
 
@@ -61,44 +63,35 @@ public class HistorialServiceImpl implements HistorialService {
         return historialRepository.findAll()
                 .stream()
                 .map(h -> new HistorialResponse(
-                        h.getId(),
-                        h.getUserId(),
-                        h.getRecipeId(),
-                        h.getFechaVista()
-                ))
+                h.getId(),
+                h.getUserId(),
+                h.getRecipeId(),
+                h.getFechaVista()
+        ))
                 .sorted((a, b) -> b.fechaVista().compareTo(a.fechaVista()))
                 .collect(Collectors.toList());
     }
 
-
-    
     @Override
-public List<ResponseRecipes> obtenerHistorialConRecetas(Long userId) {
+    public List<ResponseRecipes> obtenerHistorialConRecetas(Long userId) {
 
-    List<HistorialReceta> historial = historialRepository.findByUserIdOrderByFechaVistaDesc(userId);
+        List<HistorialReceta> historial = historialRepository
+                .findByUserIdOrderByFechaVistaDesc(userId);
 
-    List<Long> recipeIds = historial.stream()
-            .map(HistorialReceta::getRecipeId)
-            .distinct()
-            .toList();
+        if (historial.isEmpty()) {
+            return Collections.emptyList();
+        }
 
-    if (recipeIds.isEmpty()) return List.of();
+        // Extraer recipeIds
+        List<Long> ids = historial.stream()
+                .map(HistorialReceta::getRecipeId)
+                .toList();
 
-    try {
-        return recipeClient.getRecipesByIds(recipeIds);
+        // Llamar microservicio de recetas
+        List<ResponseRecipes> recetas = recipeClient.getRecipesByIds(ids);
 
-    } catch (FeignException.NotFound e) {
-        // Error 404 desde recipe-service
-        throw new RuntimeException("Alguna de las recetas no se encuentra disponible");
-    
-    } catch (FeignException e) {
-        // Error 500, timeouts, servicio caído, etc.
-        throw new RuntimeException("No se pudo obtener la información de las recetas. Intenta más tarde.");
+        return recetas;
     }
-}
-
-
-
 
     // ============================================================
     // ELIMINACIONES
